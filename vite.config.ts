@@ -76,6 +76,7 @@ export default defineConfig(({ mode }) => {
       "process.env.REACT_APP_GOOGLE_ANALYTICS": JSON.stringify(env.REACT_APP_GOOGLE_ANALYTICS),
       "process.env.REACT_APP_CONTENT_ROOT": JSON.stringify(env.REACT_APP_CONTENT_ROOT),
       "process.env.REACT_APP_B1_ROOT": JSON.stringify(env.REACT_APP_B1_ROOT),
+      "process.env.REACT_APP_B1_WEBSITE_URL": JSON.stringify(env.REACT_APP_B1_WEBSITE_URL),
       "process.env.REACT_APP_B1ADMIN_ROOT": JSON.stringify(env.REACT_APP_B1ADMIN_ROOT),
       "process.env.REACT_APP_LESSONS_ROOT": JSON.stringify(env.REACT_APP_LESSONS_ROOT),
       "process.env.NEXT_PUBLIC_STAGE": JSON.stringify(env.REACT_APP_STAGE),
