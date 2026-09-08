@@ -18,10 +18,25 @@ type Props = {
 
 const kebab = (value: string): string => (value || "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
+// "Show on home page" is stored as a tag rather than a column: no schema change,
+// no Api change, and the website's existing ?tag= filter reads it unaltered. The
+// checkbox also makes the value untypeable, which a free-text tag field is not.
+const HOME_TAG = "home-feature";
+
+const splitTags = (tags: string | null | undefined): string[] =>
+  (tags || "").split(",").map((t) => t.trim()).filter(Boolean);
+
+/** Add or remove HOME_TAG, preserving every other tag and their order. */
+const withHomeTag = (tags: string | null | undefined, show: boolean): string => {
+  const rest = splitTags(tags).filter((t) => t.toLowerCase() !== HOME_TAG);
+  return (show ? [...rest, HOME_TAG] : rest).join(", ");
+};
+
 export function BlogPostEdit(props: Props) {
   const [post, setPost] = useState<PostInterface>({ ...props.post });
   const [slugTouched, setSlugTouched] = useState<boolean>(!!props.post.id);
   const [published, setPublished] = useState<boolean>(!!props.post.publishDate);
+  const [showOnHome, setShowOnHome] = useState<boolean>(splitTags(props.post.tags).some((t) => t.toLowerCase() === HOME_TAG));
   const [showGallery, setShowGallery] = useState<boolean>(false);
   const [showPreview, setShowPreview] = useState<boolean>(false);
   const [showAuthorSearch, setShowAuthorSearch] = useState<boolean>(false);
@@ -75,6 +90,7 @@ export function BlogPostEdit(props: Props) {
       const toSave: PostInterface = {
         ...post,
         slug,
+        tags: withHomeTag(post.tags, showOnHome),
         publishDate: published ? (post.publishDate || new Date()) : null
       };
       await ApiHelper.post("/posts", [toSave], "ContentApi");
@@ -143,6 +159,7 @@ export function BlogPostEdit(props: Props) {
               {published && (
                 <TextField size="small" type="date" label={Locale.label("site.blogEdit.publishDate")} value={dateInputValue()} onChange={(ev) => setPost((p) => ({ ...p, publishDate: ev.target.value ? new Date(ev.target.value) : new Date() }))} InputLabelProps={{ shrink: true }} />
               )}
+              <FormControlLabel control={<Switch checked={showOnHome} onChange={(ev) => setShowOnHome(ev.target.checked)} data-testid="blog-show-on-home-switch" />} label={Locale.label("site.blogEdit.showOnHome", "Show on home page")} />
             </Stack>
           </Grid>
         </Grid>
